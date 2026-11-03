@@ -9,3 +9,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+logging:
+  level:
+    root: INFO
+    ar.edu.unju.fi: DEBUG
