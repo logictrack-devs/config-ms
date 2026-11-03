@@ -1,3 +1,4 @@
+
 server:
   port: 8066
 
@@ -19,27 +20,29 @@ management:
 spring:
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: false
-      routes:
-        - id: security
-          uri: http://localhost:8080
-          predicates:
-            - Path=/applications/apisecurity/**
-          filters:
-            - RewritePath=/applications/apisecurity/(?<segment>.*), /${segment}
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false
+          routes:
+            - id: security
+              uri: lb://SECURITY-SERVICE
+              predicates:
+                - Path=/applications/apisecurity/**
+              filters:
+                - StripPrefix=2
 
-        - id: shipment
-          uri: http://localhost:8081
-          predicates:
-            - Path=/applications/apishipment/**
-          filters:
-            - RewritePath=/applications/apishipment/(?<segment>.*), /${segment}
+            - id: shipment
+              uri: lb://SHIPMENT-SERVICE
+              predicates:
+                - Path=/applications/apishipment/**
+              filters:
+                - StripPrefix=2
 
-        - id: courier
-          uri: http://localhost:8082
-          predicates:
-            - Path=/applications/apicourier/**
-          filters:
-            - RewritePath=/applications/apicourier/(?<segment>.*), /${segment}
+            - id: courier
+              uri: lb://COURIER-SERVICE
+              predicates:
+                - Path=/applications/apicourier/**
+              filters:
+                - StripPrefix=2
