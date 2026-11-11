@@ -1,0 +1,65 @@
+
+server:
+  port: 8066
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8065/eureka/}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,gateway
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - PATCH
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders:
+                  - Authorization
+                  - Content-Type
+                  - Accept
+                maxAge: 3600
+          discovery:
+            locator:
+              enabled: false
+          routes:
+            - id: security
+              uri: lb://SECURITY-SERVICE
+              predicates:
+                - Path=/applications/apisecurity/**
+              filters:
+                - StripPrefix=2
+
+            - id: shipment
+              uri: lb://SHIPMENT-SERVICE
+              predicates:
+                - Path=/applications/apishipment/**
+              filters:
+                - StripPrefix=2
+
+            - id: courier
+              uri: lb://COURIER-SERVICE
+              predicates:
+                - Path=/applications/apicourier/**
+              filters:
+                - StripPrefix=2
